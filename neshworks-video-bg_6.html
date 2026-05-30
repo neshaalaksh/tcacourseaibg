@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Neshworks Video Background</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 1920px; height: 1080px;
+  overflow: hidden; background: #0C0A0F;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* ── BASE GRADIENT ── */
+.base {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 1600px 1000px at 36% 55%, rgba(50,44,175,0.22) 0%, transparent 65%),
+    radial-gradient(ellipse 800px 600px at 88% 12%, rgba(55,48,200,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 700px 550px at 92% 92%, rgba(160,100,10,0.14) 0%, transparent 60%),
+    radial-gradient(ellipse 500px 400px at 5% 88%, rgba(55,48,180,0.09) 0%, transparent 55%),
+    radial-gradient(ellipse 300px 250px at 50% 2%, rgba(72,64,204,0.08) 0%, transparent 60%),
+    linear-gradient(165deg, #151220 0%, #0C0A0F 50%, #130F1C 100%);
+}
+
+/* ── CANVAS LAYERS ── */
+#hexgrid   { position: absolute; inset: 0; pointer-events: none; }
+#particles { position: absolute; inset: 0; pointer-events: none; }
+#dataflow  { position: absolute; inset: 0; pointer-events: none; }
+
+/* ── VIGNETTE ── */
+.vignette {
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse 100% 100% at 50% 50%,
+    transparent 40%, rgba(10,8,15,0.5) 80%, rgba(10,8,15,0.85) 100%);
+}
+
+/* ── FLOATING LOGOS ── */
+#logo-layer { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.fl {
+  position: absolute;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  animation: logoFloat var(--dur,20s) ease-in-out infinite var(--delay,0s);
+  filter: grayscale(1) brightness(2.2);
+  will-change: transform, opacity;
+}
+.fl svg { width: var(--sz,36px); height: var(--sz,36px); }
+@keyframes logoFloat {
+  0%,100% { transform: translate(0,0) rotate(0deg); opacity:0; }
+  10%      { opacity: var(--op,0.07); }
+  35%      { transform: translate(var(--mx,12px),var(--my,-16px)) rotate(var(--r1,3deg)); }
+  65%      { transform: translate(var(--mx2,-8px),var(--my2,10px)) rotate(var(--r2,-2deg)); }
+  90%      { opacity: var(--op,0.07); }
+}
+
+/* ── SCREEN ── */
+.screen-wrap {
+  position: absolute;
+  top: 50%; left: 38%;
+  transform: translate(-50%, -50%);
+  width: 1240px; height: 790px;
+}
+.screen-halo {
+  position: absolute; inset: -20px; border-radius: 36px;
+  background: linear-gradient(135deg,
+    rgba(72,64,204,0.2) 0%, rgba(184,114,15,0.1) 50%, rgba(72,64,204,0.16) 100%);
+  filter: blur(24px);
+}
+.screen-halo2 {
+  position: absolute; inset: -7px; border-radius: 32px;
+  background: linear-gradient(135deg,
+    rgba(90,80,230,0.28) 0%, rgba(200,130,20,0.18) 50%, rgba(80,70,210,0.24) 100%);
+  filter: blur(7px);
+}
+.screen-rim {
+  position: absolute; inset: -1.5px; border-radius: 28px;
+  background: linear-gradient(135deg,
+    rgba(120,108,255,0.75) 0%,
+    rgba(200,140,20,0.5) 30%,
+    rgba(90,80,220,0.55) 65%,
+    rgba(210,145,22,0.45) 100%);
+  padding: 1.5px;
+}
+.screen-rim-inner { width:100%; height:100%; border-radius:27px; background:#0C0A0F; }
+.screen {
+  position: absolute; inset:0; border-radius:26px;
+  background: rgba(12,10,15,0.45); overflow:hidden;
+}
+.screen-topbar {
+  position: absolute; top:0; left:0; right:0; height:2.5px;
+  background: linear-gradient(90deg,
+    transparent 0%, rgba(120,108,255,0.9) 30%,
+    rgba(220,150,20,0.9) 50%,
+    rgba(120,108,255,0.9) 70%, transparent 100%);
+  /* NO animation — static, clean */
+}
+.screen-pip {
+  position: absolute; width:14px; height:14px;
+  border-color: rgba(120,108,255,0.4); border-style:solid; border-width:0;
+}
+.pip-tl { top:14px; left:14px; border-top-width:1.5px; border-left-width:1.5px; border-radius:3px 0 0 0; }
+.pip-tr { top:14px; right:14px; border-top-width:1.5px; border-right-width:1.5px; border-radius:0 3px 0 0; }
+.pip-bl { bottom:14px; left:14px; border-bottom-width:1.5px; border-left-width:1.5px; border-radius:0 0 0 3px; }
+.pip-br { bottom:14px; right:14px; border-bottom-width:1.5px; border-right-width:1.5px; border-radius:0 0 3px 0; }
+
+/* ── PODIUM ── */
+.podium-wrap {
+  position: absolute; right: 46px; bottom: 0; width: 340px;
+}
+.podium-glow {
+  position: absolute; bottom: 78px; right: 46px;
+  width: 340px; height: 24px;
+  background: radial-gradient(ellipse at center, rgba(90,80,220,0.3), transparent 70%);
+  filter: blur(10px);
+  animation: glowPulse 3s ease infinite;
+}
+.podium {
+  position: relative; width:100%; height:80px;
+  border-radius:18px 18px 0 0; overflow:hidden;
+  border:1px solid rgba(110,100,240,0.28); border-bottom:none;
+}
+.podium-bg {
+  position: absolute; inset: 0;
+  background: linear-gradient(160deg, #1C1828 0%, #241F32 45%, #1A1626 100%);
+}
+.podium-shimmer {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 100% 120% at 50% 130%, rgba(80,70,210,0.22) 0%, transparent 65%),
+    radial-gradient(ellipse 60% 60% at 8% 50%, rgba(72,64,204,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 92% 30%, rgba(184,114,15,0.06) 0%, transparent 60%);
+}
+.podium-topline {
+  position: absolute; top:0; left:0; right:0; height:1.5px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(120,108,255,0.9) 18%,
+    rgba(220,150,20,0.8) 50%,
+    rgba(120,108,255,0.9) 82%,
+    transparent 100%);
+}
+.podium-content {
+  position: relative; z-index:2;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  height:100%; gap:5px;
+}
+.podium-name {
+  font-size:24px; font-weight:700;
+  letter-spacing:0.13em; text-transform:uppercase;
+  background: linear-gradient(120deg, #BF8210 0%, #F2C555 38%, #E8A020 68%, #C07818 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  filter: drop-shadow(0 0 14px rgba(220,150,20,0.4));
+}
+.podium-sub {
+  font-size:10px; font-weight:500;
+  letter-spacing:0.22em; text-transform:uppercase;
+  color:rgba(255,255,255,0.22);
+}
+
+/* ── OUTER FRAME CORNERS ── */
+.fc { position: absolute; }
+.fc-tl { top:16px; left:16px; }
+.fc-tr { top:16px; right:16px; }
+.fc-bl { bottom:16px; left:16px; }
+.fc-br { bottom:16px; right:16px; }
+
+/* ── RIGHT PANEL GUTTER ── */
+.right-gutter {
+  position:absolute; right:0; top:0; bottom:0; width:430px;
+  background: linear-gradient(to left, rgba(72,64,204,0.05) 0%, transparent 100%);
+  pointer-events:none;
+}
+.rg-line-1 {
+  position:absolute; right:428px; top:0; bottom:0; width:1px;
+  background: linear-gradient(to bottom,
+    transparent 0%, rgba(100,90,240,0.18) 25%,
+    rgba(100,90,240,0.1) 60%, rgba(184,114,15,0.12) 80%, transparent 100%);
+}
+.rg-line-2 {
+  position:absolute; right:416px; top:0; bottom:0; width:1px;
+  background: linear-gradient(to bottom,
+    transparent 0%, rgba(100,90,240,0.08) 30%, transparent 100%);
+}
+
+/* ── BOTTOM BAR ── */
+.bottom-bar {
+  position:absolute; bottom:0; left:0; right:0; height:2.5px;
+  background: linear-gradient(90deg,
+    transparent 0%, rgba(72,64,204,0.45) 22%,
+    rgba(184,114,15,0.55) 50%,
+    rgba(72,64,204,0.45) 78%, transparent 100%);
+}
+
+@keyframes glowPulse { 0%,100%{opacity:.35} 50%{opacity:.75} }
+</style>
+</head>
+<body>
+
+<div class="base"></div>
+
+<!-- LAYERED CANVASES -->
+<svg id="hexgrid" xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080"></svg>
+<canvas id="particles" width="1920" height="1080"></canvas>
+<canvas id="dataflow"  width="1920" height="1080"></canvas>
+
+<div class="vignette"></div>
+<div id="logo-layer"></div>
+
+<!-- RIGHT GUTTER -->
+<div class="right-gutter">
+  <div class="rg-line-1"></div>
+  <div class="rg-line-2"></div>
+</div>
+
+<!-- OUTER FRAME CORNERS -->
+<svg class="fc fc-tl" width="64" height="64" viewBox="0 0 64 64">
+  <path d="M0 64 L0 10 Q0 0 10 0 L64 0" stroke="rgba(110,100,240,0.38)" stroke-width="1.5" fill="none"/>
+  <circle cx="0" cy="0" r="3.5" fill="rgba(110,100,240,0.55)"/>
+  <circle cx="0" cy="0" r="1.5" fill="rgba(110,100,240,0.9)"/>
+</svg>
+<svg class="fc fc-tr" width="64" height="64" viewBox="0 0 64 64">
+  <path d="M64 64 L64 10 Q64 0 54 0 L0 0" stroke="rgba(110,100,240,0.38)" stroke-width="1.5" fill="none"/>
+  <circle cx="64" cy="0" r="3.5" fill="rgba(110,100,240,0.55)"/>
+  <circle cx="64" cy="0" r="1.5" fill="rgba(110,100,240,0.9)"/>
+</svg>
+<svg class="fc fc-bl" width="64" height="64" viewBox="0 0 64 64">
+  <path d="M0 0 L0 54 Q0 64 10 64 L64 64" stroke="rgba(110,100,240,0.28)" stroke-width="1.5" fill="none"/>
+  <circle cx="0" cy="64" r="3.5" fill="rgba(110,100,240,0.38)"/>
+  <circle cx="0" cy="64" r="1.5" fill="rgba(110,100,240,0.7)"/>
+</svg>
+<svg class="fc fc-br" width="64" height="64" viewBox="0 0 64 64">
+  <path d="M64 0 L64 54 Q64 64 54 64 L0 64" stroke="rgba(110,100,240,0.28)" stroke-width="1.5" fill="none"/>
+  <circle cx="64" cy="64" r="3.5" fill="rgba(110,100,240,0.38)"/>
+  <circle cx="64" cy="64" r="1.5" fill="rgba(110,100,240,0.7)"/>
+</svg>
+
+<!-- SCREEN -->
+<div class="screen-wrap">
+  <div class="screen-halo"></div>
+  <div class="screen-halo2"></div>
+  <div class="screen-rim"><div class="screen-rim-inner"></div></div>
+  <div class="screen">
+    <div class="screen-topbar"></div>
+    <div class="screen-pip pip-tl"></div>
+    <div class="screen-pip pip-tr"></div>
+    <div class="screen-pip pip-bl"></div>
+    <div class="screen-pip pip-br"></div>
+  </div>
+</div>
+
+<!-- PODIUM -->
+<div class="podium-glow"></div>
+<div class="podium-wrap">
+  <div class="podium">
+    <div class="podium-bg"></div>
+    <div class="podium-shimmer"></div>
+    <div class="podium-topline"></div>
+    <div class="podium-content">
+      <span class="podium-name">Neshaa Laksh</span>
+      <span class="podium-sub">Fractional AI Operator · Neshworks</span>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-bar"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// 1. HEX GRID — static, drawn once
+// ═══════════════════════════════════════════════════════════════
+(function() {
+  const svg = document.getElementById('hexgrid');
+  const ns = 'http://www.w3.org/2000/svg';
+  const R = 48;
+  const W = R * 2, H = Math.sqrt(3) * R;
+  const cols = Math.ceil(1920 / (W * 0.75)) + 2;
+  const rows = Math.ceil(1080 / H) + 2;
+
+  // screen center for proximity fade
+  const SCX = 1920 * 0.38, SCY = 540;
+  const SHW = 640, SHH = 420; // half-dims of screen
+
+  for (let row = -1; row < rows; row++) {
+    for (let col = -1; col < cols; col++) {
+      const cx = col * W * 0.75;
+      const cy = row * H + (col % 2 === 0 ? 0 : H / 2);
+
+      // skip hexes inside screen
+      if (cx > SCX - SHW - 20 && cx < SCX + SHW + 20 &&
+          cy > SCY - SHH - 20 && cy < SCY + SHH + 20) continue;
+
+      // distance-based fade from screen edge
+      const nearX = Math.max(0, Math.abs(cx - SCX) - SHW);
+      const nearY = Math.max(0, Math.abs(cy - SCY) - SHH);
+      const edgeDist = Math.sqrt(nearX*nearX + nearY*nearY);
+      const edgeFade = Math.min(1, edgeDist / 280);
+
+      // corner vignette fade
+      const ex = Math.min(cx / 180, (1920-cx) / 180, 1);
+      const ey = Math.min(cy / 120, (1080-cy) / 120, 1);
+      const vignFade = Math.min(ex, ey);
+
+      const seed = ((row * 137 + col) * 7919) & 0xfffff;
+      const rnd = (seed % 1000) / 1000;
+
+      const baseOp = edgeFade * vignFade;
+      if (baseOp < 0.02) continue;
+
+      const strokeOp = baseOp * (0.04 + rnd * 0.06);
+      const filled = rnd > 0.93;
+      const fillOp = filled ? baseOp * (0.03 + rnd * 0.04) : 0;
+
+      const pts = [];
+      for (let i = 0; i < 6; i++) {
+        const a = Math.PI / 180 * (60 * i - 30);
+        pts.push((cx + R * Math.cos(a)).toFixed(1) + ',' + (cy + R * Math.sin(a)).toFixed(1));
+      }
+
+      const poly = document.createElementNS(ns, 'polygon');
+      poly.setAttribute('points', pts.join(' '));
+      poly.setAttribute('stroke', `rgba(88,78,220,${strokeOp.toFixed(4)})`);
+      poly.setAttribute('stroke-width', '0.55');
+      if (filled) poly.setAttribute('fill', `rgba(72,64,200,${fillOp.toFixed(4)})`);
+      else poly.setAttribute('fill', 'none');
+      svg.appendChild(poly);
+    }
+  }
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// 2. NEURAL PARTICLES — animated, in margins only
+// ═══════════════════════════════════════════════════════════════
+(function() {
+  const c = document.getElementById('particles');
+  const ctx = c.getContext('2d');
+  const P = 'rgba(80,70,220,', G = 'rgba(184,114,15,';
+
+  // zones outside screen
+  const ZONES = [
+    {x:0,    y:0,    w:220,  h:1080},  // far left
+    {x:1700, y:0,    w:220,  h:1080},  // far right
+    {x:220,  y:0,    w:1480, h:105},   // top strip
+    {x:220,  y:975,  w:1480, h:105},   // bottom strip
+    {x:1480, y:105,  w:220,  h:870},   // right gutter
+  ];
+  const counts = [20, 16, 12, 12, 10];
+  const nodes = [];
+
+  ZONES.forEach((z, zi) => {
+    for (let i = 0; i < counts[zi]; i++) {
+      nodes.push({
+        x: z.x + Math.random() * z.w,
+        y: z.y + Math.random() * z.h,
+        vx: (Math.random()-.5)*.18, vy: (Math.random()-.5)*.18,
+        r: 1.2 + Math.random()*2,
+        ph: Math.random()*Math.PI*2,
+        ps: .005 + Math.random()*.009,
+        gold: Math.random() < .14,
+        zi
+      });
+    }
+  });
+
+  function clamp(n) {
+    const z = ZONES[n.zi], p = 14;
+    if (n.x < z.x+p) n.vx += .035;
+    if (n.x > z.x+z.w-p) n.vx -= .035;
+    if (n.y < z.y+p) n.vy += .035;
+    if (n.y > z.y+z.h-p) n.vy -= .035;
+    n.vx *= .982; n.vy *= .982;
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, 1920, 1080);
+    nodes.forEach(n => { n.x+=n.vx; n.y+=n.vy; n.ph+=n.ps; clamp(n); });
+
+    // connections
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i+1; j < nodes.length; j++) {
+        const a = nodes[i], b = nodes[j];
+        const dx = a.x-b.x, dy = a.y-b.y;
+        const d = Math.sqrt(dx*dx+dy*dy);
+        if (d < 185) {
+          ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+          ctx.strokeStyle = (a.gold||b.gold?G:P) + ((1-d/185)*.13) + ')';
+          ctx.lineWidth = .65; ctx.stroke();
+        }
+      }
+    }
+
+    // nodes
+    nodes.forEach(n => {
+      const p = (Math.sin(n.ph)+1)/2;
+      const col = n.gold ? G : P;
+      const al = .25+p*.5, r = n.r+p*1.1;
+      const gr = ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,r*5);
+      gr.addColorStop(0, col+(al*.5)+')'); gr.addColorStop(1, col+'0)');
+      ctx.beginPath(); ctx.arc(n.x,n.y,r*5,0,Math.PI*2); ctx.fillStyle=gr; ctx.fill();
+      ctx.beginPath(); ctx.arc(n.x,n.y,r,0,Math.PI*2); ctx.fillStyle=col+al+')'; ctx.fill();
+    });
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// 3. DATA STREAMS — flowing vertical light streams in side margins
+// ═══════════════════════════════════════════════════════════════
+(function() {
+  const c = document.getElementById('dataflow');
+  const ctx = c.getContext('2d');
+
+  const streams = [];
+  // create streams only in left and right gutters
+  const gutterZones = [
+    {x:0, w:220},    // left
+    {x:1700, w:220}, // right
+  ];
+
+  gutterZones.forEach(gz => {
+    for (let i = 0; i < 8; i++) {
+      streams.push({
+        x: gz.x + Math.random() * gz.w,
+        y: Math.random() * 1080,
+        len: 60 + Math.random() * 120,
+        speed: 0.4 + Math.random() * 0.8,
+        op: 0.05 + Math.random() * 0.12,
+        gold: Math.random() < 0.2,
+        w: 0.5 + Math.random() * 0.8,
+      });
+    }
+  });
+
+  function draw() {
+    ctx.clearRect(0, 0, 1920, 1080);
+    streams.forEach(s => {
+      s.y += s.speed;
+      if (s.y - s.len > 1080) s.y = -s.len;
+
+      const col = s.gold ? '184,114,15' : '80,70,220';
+      const grad = ctx.createLinearGradient(s.x, s.y - s.len, s.x, s.y);
+      grad.addColorStop(0, `rgba(${col},0)`);
+      grad.addColorStop(0.5, `rgba(${col},${s.op})`);
+      grad.addColorStop(1, `rgba(${col},0)`);
+
+      ctx.beginPath();
+      ctx.moveTo(s.x, s.y - s.len);
+      ctx.lineTo(s.x, s.y);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = s.w;
+      ctx.stroke();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// 4. FLOATING AI LOGOS
+// ═══════════════════════════════════════════════════════════════
+(function() {
+  const logos = [
+    `<svg viewBox="0 0 41 41" fill="none"><path d="M37.532 16.87a9.963 9.963 0 0 0-.856-8.184 10.078 10.078 0 0 0-10.855-4.835 9.964 9.964 0 0 0-6.675-3.027 10.079 10.079 0 0 0-9.612 6.987 9.967 9.967 0 0 0-6.664 4.834 10.08 10.08 0 0 0 1.24 11.817 9.965 9.965 0 0 0 .856 8.185 10.079 10.079 0 0 0 10.855 4.835 9.965 9.965 0 0 0 6.675 3.027 10.079 10.079 0 0 0 9.617-6.992 9.967 9.967 0 0 0 6.663-4.834 10.079 10.079 0 0 0-1.243-11.813zM22.498 37.886a7.474 7.474 0 0 1-4.799-1.735c.061-.033.168-.091.237-.134l7.964-4.6a1.294 1.294 0 0 0 .655-1.134V19.054l3.366 1.944a.12.12 0 0 1 .066.092v9.299a7.505 7.505 0 0 1-7.49 7.496zM6.392 31.006a7.471 7.471 0 0 1-.894-5.023c.06.036.162.099.237.141l7.964 4.6a1.297 1.297 0 0 0 1.308 0l9.724-5.614v3.888a.12.12 0 0 1-.048.103l-8.051 4.649a7.504 7.504 0 0 1-10.24-2.744zM4.297 13.62A7.469 7.469 0 0 1 8.2 10.333c0 .068-.004.19-.004.274v9.201a1.294 1.294 0 0 0 .654 1.132l9.723 5.614-3.366 1.944a.12.12 0 0 1-.114.012L7.044 23.86a7.504 7.504 0 0 1-2.747-10.24zm27.658 6.437l-9.724-5.615 3.367-1.943a.121.121 0 0 1 .114-.012l8.048 4.648a7.498 7.498 0 0 1-1.158 13.528v-9.476a1.293 1.293 0 0 0-.647-1.13zm3.35-5.043c-.059-.037-.162-.099-.236-.141l-7.965-4.6a1.298 1.298 0 0 0-1.308 0l-9.723 5.614v-3.888a.12.12 0 0 1 .048-.103l8.05-4.645a7.497 7.497 0 0 1 11.135 7.763zm-21.063 6.929l-3.367-1.944a.12.12 0 0 1-.065-.092v-9.299a7.497 7.497 0 0 1 12.293-5.756 6.94 6.94 0 0 0-.236.134l-7.965 4.6a1.294 1.294 0 0 0-.654 1.132l-.006 11.225zm1.829-3.943l4.33-2.501 4.332 2.497v4.998l-2.597 1.5-2.607-1.5z" fill="white"/></svg>`,
+    `<svg viewBox="0 0 24 24" fill="none"><path d="M13.827 3.988c.592-1.566 2.754-1.566 3.346 0l6.515 17.24c.418 1.106-.372 2.272-1.55 2.272h-2.51c-.77 0-1.455-.488-1.715-1.216l-.902-2.503H6.989l-.902 2.503A1.815 1.815 0 0 1 4.372 23.5H1.862C.684 23.5-.106 22.334.312 21.228L6.827 3.988a1.815 1.815 0 0 1 3.346 0l.654 1.73.654-1.73ZM8.428 15.772h7.144L12 7.2l-3.572 8.572Z" fill="white"/></svg>`,
+    `<svg viewBox="0 0 28 28" fill="none"><path d="M14 28C14 26.063 13.627 24.243 12.88 22.54C12.157 20.837 11.165 19.355 9.905 18.095C8.645 16.835 7.163 15.843 5.46 15.12C3.757 14.373 1.937 14 0 14C1.937 14 3.757 13.638 5.46 12.915C7.163 12.168 8.645 11.165 9.905 9.905C11.165 8.645 12.157 7.163 12.88 5.46C13.627 3.757 14 1.937 14 0C14 1.937 14.362 3.757 15.085 5.46C15.832 7.163 16.835 8.645 18.095 9.905C19.355 11.165 20.837 12.168 22.54 12.915C24.243 13.638 26.063 14 28 14C26.063 14 24.243 14.373 22.54 15.12C20.837 15.843 19.355 16.835 18.095 18.095C16.835 19.355 15.832 20.837 15.085 22.54C14.362 24.243 14 26.063 14 28Z" fill="white"/></svg>`,
+    `<svg viewBox="0 0 28 28" fill="none"><path d="M14 2L3 8.5V19.5L14 26L25 19.5V8.5L14 2Z" stroke="white" stroke-width="1.5" fill="none"/><path d="M14 2V26M3 8.5L25 19.5M25 8.5L3 19.5" stroke="white" stroke-width="0.7" opacity="0.45"/></svg>`,
+    `<svg viewBox="0 0 60 30" fill="none"><rect x="1" y="7" width="16" height="16" rx="4" fill="white"/><rect x="22" y="7" width="16" height="16" rx="4" fill="white"/><rect x="43" y="7" width="16" height="16" rx="4" fill="white"/><line x1="17" y1="15" x2="22" y2="15" stroke="white" stroke-width="2"/><line x1="38" y1="15" x2="43" y2="15" stroke="white" stroke-width="2"/><text x="5" y="20" font-size="10" fill="#0C0A0F" font-weight="800" font-family="sans-serif">n</text><text x="27" y="20" font-size="10" fill="#0C0A0F" font-weight="800" font-family="sans-serif">8</text><text x="48" y="20" font-size="10" fill="#0C0A0F" font-weight="800" font-family="sans-serif">n</text></svg>`,
+    `<svg viewBox="0 0 24 24" fill="none"><path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.14c-.093-.514.28-.887.747-.933z" fill="white"/></svg>`,
+    `<svg viewBox="0 0 24 24" fill="none"><path d="M11.988 7.473V.006h.024L14.977 0l-.013 7.467 5.275-5.274 2.568 2.568-5.276 5.275H24v2.99l.006.014-7.467-.014v.025l5.274 5.274-2.568 2.568-5.275-5.276.014 7.468h-3.003L11 16.631v-.025l-5.274 5.275-2.568-2.568 5.274-5.274H.006v-.025L0 10.98l7.467.013v-.025L2.193 5.693l2.568-2.568z" fill="white"/></svg>`,
+    `<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="white" stroke-width="1.2" fill="none"/><path d="M8 13.5C8.5 15.5 10 17 12 17C14 17 15.5 15.5 16 13.5" stroke="white" stroke-width="1.2" stroke-linecap="round"/><circle cx="9" cy="10" r="1.2" fill="white"/><circle cx="15" cy="10" r="1.2" fill="white"/></svg>`,
+    `<svg viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="2" stroke="white" stroke-width="1.2" fill="none"/><path d="M9 9l6 3-6 3V9z" fill="white"/></svg>`,
+    `<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.2" fill="none"/><circle cx="12" cy="12" r="5" stroke="white" stroke-width="1" fill="none" opacity="0.55"/><circle cx="12" cy="12" r="2" fill="white" opacity="0.8"/></svg>`,
+    `<svg viewBox="0 0 24 24" fill="none"><path d="M4 4l7 18 3-7 7-3L4 4z" stroke="white" stroke-width="1.3" stroke-linejoin="round" fill="none"/><path d="M14 14l5 5" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg>`,
+    `<svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="white" opacity="0.85"/></svg>`,
+  ];
+
+  // only place logos in left margin and right gutter, not near screen
+  const PLACE_ZONES = [
+    {x:10, y:10, w:200, h:1060},
+    {x:1720, y:10, w:190, h:1060},
+    {x:210, y:10, w:400, h:90},
+    {x:1300, y:980, w:600, h:90},
+  ];
+
+  const layer = document.getElementById('logo-layer');
+
+  logos.forEach((svg) => {
+    const sz = 28 + Math.floor(Math.random() * 24);
+    const pz = PLACE_ZONES[Math.floor(Math.random() * PLACE_ZONES.length)];
+    const x = pz.x + Math.random() * (pz.w - sz);
+    const y = pz.y + Math.random() * (pz.h - sz);
+
+    const mx  = (Math.random()-.5)*26, my  = (Math.random()-.5)*26;
+    const mx2 = (Math.random()-.5)*16, my2 = (Math.random()-.5)*16;
+    const r1  = (Math.random()-.5)*9,  r2  = (Math.random()-.5)*7;
+    const dur = 14 + Math.random()*14;
+    const delay = -(Math.random() * 22);
+    const op = 0.055 + Math.random()*0.05;
+
+    const el = document.createElement('div');
+    el.className = 'fl';
+    el.style.cssText = `left:${x}px;top:${y}px;--sz:${sz}px;--dur:${dur}s;--delay:${delay}s;--mx:${mx}px;--my:${my}px;--mx2:${mx2}px;--my2:${my2}px;--r1:${r1}deg;--r2:${r2}deg;--op:${op};`;
+    el.innerHTML = svg;
+    layer.appendChild(el);
+  });
+})();
+</script>
+</body>
+</html>
